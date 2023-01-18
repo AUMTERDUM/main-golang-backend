@@ -143,7 +143,7 @@ type ProblemRecord struct {
 	Problemtypes []Problemtype `json:"problemtype" gorm:"-"`
 	Levels       []Level       `json:"levels" gorm:"-"`
 	Users        []User        `json:"operators" gorm:"-"`
-	//asdasdljsdl;kfj;ajriogjae[o'rjgadjfg;sldkfkjg]asdasdasdasdawdawdasdawdawdawdadawdawdasdawdadasdawdad
+	//asdasdljsdl;kfj;ajriogjae[o'rjgadjfg;sldkfkjg]asdasdasdasdawdawdasdawdadasdasdawdadasdwdawdadawdawdasdawdadasdawdad
 }
 
 type Statuse struct {
