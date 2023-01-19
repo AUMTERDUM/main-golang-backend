@@ -145,9 +145,9 @@ func GetProblemRecords(c *fiber.Ctx) error {
 
 	for index, data5 := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Users = MapUser(data5.Operator,users)
-		// for index, data := range repo.ProblemRecord {
-		// 	users[index].ListSystem = mapSystem(data.System, systems)
-		// }
+		for index, data := range users {
+			users[index].ListSystem = mapSystem(data.Systems, systems)
+		}
 	}
 
 
@@ -157,6 +157,62 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	return c.JSON(repo)
 }
 
+func GetProblemById(c *fiber.Ctx) error {
+	id, _ := strconv.Atoi(c.Params("id"))
+	//var problemrecord entities.ProblemRecord
+	//database.Instance.Preload("Statuse").First(&problemrecord, id)
+	var repo entities.Meta
+	var systems []entities.System
+	var contacts []entities.Contact
+	var problemtype []entities.Problemtype
+	var agencies []entities.Agency
+	var levels []entities.Level
+	var users []entities.User
+	// var list []entities.ProblemRecord
+	database.Instance.Preload("Statuse").First(&repo.ProblemRecord, id)
+	database.Instance.Find(&systems)
+	database.Instance.Find(&contacts)
+	database.Instance.Find(&problemtype)
+	database.Instance.Find(&agencies)
+	database.Instance.Find(&levels)
+	database.Instance.Find(&users)
+	
+	// for index, data := range systems {
+	// 	fmt.Println(data.Name, index)
+	// }
+
+	for index, data := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
+	}
+
+	for index, data1 := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact,contacts)
+	}
+
+	for index, data2 := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype,problemtype)
+	}
+
+	for index, data3 := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency,agencies)
+	}
+
+	for index, data4 := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Levels = MapLevel(data4.Level,levels)
+	}
+
+	for index, data5 := range repo.ProblemRecord {
+		repo.ProblemRecord[index].Users = MapUser(data5.Operator,users)
+		for index, data := range users {
+			users[index].ListSystem = mapSystem(data.Systems, systems)
+		}
+	}
+
+
+	c.JSON(repo)
+	c.Set("Content-Type", "application/json")
+	return c.JSON(repo)
+}
 
 
 func mapSystem(listStr string, systems []entities.System) []entities.System {
@@ -330,6 +386,10 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 
 func CancalProblemRecord(c *fiber.Ctx) error {
 	id := c.Params("id")
+	Casuseproblem := c.FormValue("casuseproblem")
+	Solution := c.FormValue("solution")
+	Suggestion := c.FormValue("suggestion")
+
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
 	fmt.Println(data_problem.ID)
@@ -340,8 +400,11 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 		})
 	}
 	problemrecord := entities.ProblemRecord{
-		CompletedAt: time.Now(),
-		Status:      4,
+		Casuseproblem: Casuseproblem,
+		Solution:      Solution,
+		Suggestion:    Suggestion,
+		CompletedAt:   time.Now(),
+		Status:        4,
 	}
 
 	if err := c.BodyParser(&problemrecord); err != nil {
@@ -355,7 +418,7 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully"})
+	return c.JSON(fiber.Map{"casuseproblem": problemrecord.Casuseproblem, "solution": problemrecord.Solution, "suggestion": problemrecord.Suggestion, "status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully"})
 	//database.Instance.Where("id = ?",id).Save(&problemrecord)
 	//return c.JSON(problemrecord)
 }
