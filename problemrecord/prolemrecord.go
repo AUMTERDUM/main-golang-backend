@@ -110,8 +110,18 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	var agencies []entities.Agency
 	var levels []entities.Level
 	var users []entities.User
+	
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil {
+		page = 1
+	}
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil {
+		limit = 10
+	}
+	offset := (page - 1) * limit
 	// var list []entities.ProblemRecord
-	database.Instance.Preload("Statuse").Find(&repo.ProblemRecord)
+	database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
 	database.Instance.Find(&problemtype)
