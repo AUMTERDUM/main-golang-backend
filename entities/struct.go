@@ -102,7 +102,7 @@ func (book *ProblemRecord) BeforeCreate(tx *gorm.DB) (err error) {
 	fmt.Println(string(byteValue))
 	jsonFile.Write(byteValue)
 
-	
+
 
 	book.ID = uuid
 	return
@@ -123,10 +123,6 @@ func ReadJsonFormLocal() Config {
 	json.Unmarshal(byteValue, &config)
 
 	fmt.Printf("config: %#v", config)
-
-	//update currentId json file
-
-	//write to file
 
 	return config
 
