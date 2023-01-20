@@ -360,6 +360,7 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 	Casuseproblem := c.FormValue("casuseproblem")
 	Solution := c.FormValue("solution")
 	Suggestion := c.FormValue("suggestion")
+	CalculateTime(c) 
 
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
@@ -389,7 +390,14 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{"casuseproblem": problemrecord.Casuseproblem, "solution": problemrecord.Solution, "suggestion": problemrecord.Suggestion, "status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully"})
+	// คำนวณเวลา และ บันทึกลง database ใน table problem_record
+	// 1. คำนวณเวลา
+	// 2. บันทึกลง database ใน table problem_record
+
+	CalculateTime(c) 
+
+
+	return c.JSON(fiber.Map{"casuseproblem": problemrecord.Casuseproblem, "solution": problemrecord.Solution, "suggestion": problemrecord.Suggestion, "status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully", "time": problemrecord.Time})
 	//database.Instance.Where("id = ?",id).Save(&problemrecord)
 	//return c.JSON(problemrecord)
 }
@@ -445,7 +453,7 @@ func CalculateTime(c *fiber.Ctx) error {
 	fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes()) // 90 minutes difference between the two times in minutes (90)
 	fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Seconds()) // 5400 seconds difference between the two times in seconds (5400)
 
-	return c.JSON(problemrecord)
+	return c.JSON(fiber.Map{"time": problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Hours()})
 }
 
 func DeleteProblemRecord(c *fiber.Ctx) error {
@@ -589,34 +597,3 @@ func Pagination(c *fiber.Ctx) entities.Pageination {
 	}
 }
 
-// func Pagination (c *fiber.Ctx) error {
-// 	var problemrecord entities.ProblemRecord
-// 	db := database.Instance
-// 	sql := "SELECT * FROM problemrecord"
-
-// 	if s := c.Query("s"); s != "" {
-// 		sql = fmt.Sprintf("SELECT * FROM problemrecord WHERE agency LIKE '%%%s%%' OR contact LIKE '%%%s%%' OR problem LIKE '%%%s%%' OR level LIKE '%%%s%%' OR informer LIKE '%%%s%%' OR informermessage LIKE '%%%s%%' OR system LIKE '%%%s%%' OR problemtype LIKE '%%%s%%' OR problemstatus LIKE '%%%s%%' OR problemtime LIKE '%%%s%%' OR problemdescription LIKE '%%%s%%'",sql, s, s, s, s, s, s, s, s, s, s, s)
-// 	}
-
-// 	if sort := c.Query("sort"); sort != "" {
-// 		sql = fmt.Sprintf("%s ORDER BY %s", sql, sort)
-// 	}
-
-// 	page, _ := strconv.Atoi(c.Query("page", "1"))
-// 	perPage := 10
-// 	var total int64
-
-// 	db.Rew(sql).Count(&total)
-
-// 	sql = fmt.Sprintf("%s LIMIT %d OFFSET %d", sql, perPage, (page-1)*perPage)
-
-// 	db.Rew(sql).Scan(&problemrecord)
-
-// 	return c.JSON(fiber.Map{
-// 		"data": problemrecord,
-// 		"meta": fiber.Map{
-// 			"page":  page,
-// 			"limit": perPage,
-// 			"total": total,
-// 		},
-// 	})

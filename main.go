@@ -5,6 +5,7 @@ import (
 	"golang-crud-rest-api/database"
 	"golang-crud-rest-api/problemrecord"
 	"golang-crud-rest-api/settings"
+	"golang-crud-rest-api/configIP"
 	"log"
 
 	//"github.com/rs/cors"
@@ -29,10 +30,10 @@ func main() {
 	// })
 
 	// Load Configurations from config.json using Viper
-	LoadAppConfig()
+	configIP.LoadAppConfig()
 
 	// Initialize Database
-	database.Connect(AppConfig.ConnectionString)
+	database.Connect(configIP.AppConfig.ConnectionString)
 	database.MigrateUSER()
 	database.MigrateSYSTEM()
 	database.MigratePROBLEM()
@@ -56,8 +57,8 @@ func main() {
 	}))
 
 	// Start the server
-	log.Printf("Starting Server on port %s\n", AppConfig.Port)
-	log.Fatal(router.Listen(fmt.Sprintf(":%s", AppConfig.Port)))
+	log.Printf("Starting Server on port %s\n", configIP.AppConfig.Port)
+	log.Fatal(router.Listen(fmt.Sprintf(":%s", configIP.AppConfig.Port)))
 
 }
 
