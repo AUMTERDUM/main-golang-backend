@@ -1,8 +1,13 @@
 package entities
 
 import (
+	"encoding/json"
+	"io"
 	"strings"
 	"time"
+
+	"fmt"
+	"os"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -81,14 +86,55 @@ type Agency struct {
 
 func (book *ProblemRecord) BeforeCreate(tx *gorm.DB) (err error) {
 	uuidWithHyphen := uuid.New()
-	//limit string length to 5 characters and remove hyphen (-) from uuid string using strings.ReplaceAll() function in Go language.
-	//start useing text "TTRS" + uuid string to create unique id for each book. For example, TTRS-1a2b3c4d5e6f7g8h9i0j
-	//heeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)
-	uuid = uuid[:3]
-	uuid = "TCC" + uuid
+	config := ReadJsonFormLocal()
+	uuid = config.Code + fmt.Sprintf("%04d", config.CurrentId)
+	//update current id
+	config.CurrentId = config.CurrentId + 1
+	//write to file
+	jsonFile, err := os.OpenFile("./entities/setting.json", os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+
+	byteValue, _ := json.Marshal(config)
+	fmt.Println(string(byteValue))
+	jsonFile.Write(byteValue)
+
+	
+
 	book.ID = uuid
 	return
+}
+
+func ReadJsonFormLocal() Config {
+	// Read json file
+	jsonFile, err := os.Open("./entities/setting.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+
+	byteValue, _ := io.ReadAll(jsonFile)
+	fmt.Println(string(byteValue))
+	var config Config
+
+	json.Unmarshal(byteValue, &config)
+
+	fmt.Printf("config: %#v", config)
+
+	//update currentId json file
+
+	//write to file
+
+	return config
+
+}
+
+type Config struct {
+	Code      string `json:"code"`
+	CurrentId int    `json:"currentId"`
 }
 
 type Status struct {
