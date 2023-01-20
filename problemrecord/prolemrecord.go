@@ -30,15 +30,15 @@ func CreateProblemRecord(c *fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-
+ 	ext := filepath.Ext(file.Filename)
 	//get file name
-	fileName := file.Filename
+	fileName := fmt.Sprint(time.Now().Unix()) + ext
 	//get file extension
-	ext := filepath.Ext(file.Filename)
+	
 	//get file size
 	size := file.Size
 	//get file path
-	filePath := "/upload/" + fileName + ext
+	filePath := "/upload/" + fileName
 	//log file data
 	fmt.Println("File Info")
 	fmt.Println("File Name:", fileName)
@@ -131,7 +131,8 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	
 	// for index, data := range systems {
 	// 	fmt.Println(data.Name, index)
-	// }
+	// }as
+
 
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
