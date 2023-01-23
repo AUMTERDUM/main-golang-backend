@@ -430,6 +430,7 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 		Suggestion:    Suggestion,
 		CompletedAt:   time.Now(),
 		Status:        4,
+		Time :         (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
 	}
 
 	if err := c.BodyParser(&problemrecord); err != nil {

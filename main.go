@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"golang-crud-rest-api/configIP"
 	"golang-crud-rest-api/database"
 	"golang-crud-rest-api/problemrecord"
 	"golang-crud-rest-api/settings"
-	"golang-crud-rest-api/configIP"
 	"log"
 
 	//"github.com/rs/cors"
@@ -47,14 +47,20 @@ func main() {
 		BodyLimit: 100 * 1024 * 1024,
 	})
 
-	RegisterProductRoutesfiber(router)
-
 	// router.Use(cors.New())
 	router.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
-		AllowHeaders: "Origin, Content-Type, Accept",
+		// AllowOrigins: "*",
+		// AllowHeaders: "Origin, Content-Type, Accept",
+		// AllowMethods: "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowOrigins:     "*",
+		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
+		AllowHeaders:     "",
+		AllowCredentials: false,
 	}))
 
+	RegisterProductRoutesfiber(router)
+
+	
 	// Start the server
 	log.Printf("Starting Server on port %s\n", configIP.AppConfig.Port)
 	log.Fatal(router.Listen(fmt.Sprintf(":%s", configIP.AppConfig.Port)))
@@ -63,7 +69,6 @@ func main() {
 
 func RegisterProductRoutesfiber(router *fiber.App) {
 
-	
 	router.Static("/upload", "./uploads")
 	router.Post("/user", settings.CreateUser)
 	router.Get("/users", settings.GetUsers)
