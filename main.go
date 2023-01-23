@@ -42,7 +42,6 @@ func main() {
 	database.MigrateANGENCY()
 	database.MigratePROBLEMRECORD()
 	database.MigrateSTATUS()
-	///database.MigrateUPLOAD()
 
 	router := fiber.New(fiber.Config{
 		BodyLimit: 100 * 1024 * 1024,

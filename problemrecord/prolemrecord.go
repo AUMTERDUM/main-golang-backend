@@ -360,7 +360,7 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 	Casuseproblem := c.FormValue("casuseproblem")
 	Solution := c.FormValue("solution")
 	Suggestion := c.FormValue("suggestion")
-	CalculateTime(c) 
+	
 
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
@@ -371,13 +371,21 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 			"message": "Record not found",
 		})
 	}
+	//(problemrecord.CompletedAt.Sub(problemrecord.CreatedAt).String())
+	//t := time.Now()
+	// fmt.Println(t)
+	// fmt.Println(data_problem.CreatedAt)
+	//hee := (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String()
 	problemrecord := entities.ProblemRecord{
 		Casuseproblem: Casuseproblem,
 		Solution:      Solution,
 		Suggestion:    Suggestion,
 		CompletedAt:   time.Now(),
 		Status:        3,
+		Time: 		   (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
 	}
+
+
 
 	if err := c.BodyParser(&problemrecord); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -390,12 +398,10 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 		})
 	}
 
-	// คำนวณเวลา และ บันทึกลง database ใน table problem_record
-	// 1. คำนวณเวลา
-	// 2. บันทึกลง database ใน table problem_record
-
+	//problemrecord.Time = time.Now().Sub(problemrecord.SenderAt).String()
 	CalculateTime(c) 
 
+	
 
 	return c.JSON(fiber.Map{"casuseproblem": problemrecord.Casuseproblem, "solution": problemrecord.Solution, "suggestion": problemrecord.Suggestion, "status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully", "time": problemrecord.Time})
 	//database.Instance.Where("id = ?",id).Save(&problemrecord)
@@ -407,6 +413,7 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 	Casuseproblem := c.FormValue("casuseproblem")
 	Solution := c.FormValue("solution")
 	Suggestion := c.FormValue("suggestion")
+
 
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
@@ -444,16 +451,30 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 //calculate time
 
 func CalculateTime(c *fiber.Ctx) error {
+
+	
 	id := c.Params("id")
 	var problemrecord entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&problemrecord)
 	c.Set("Content-Type", "application/json")
 	c.JSON(problemrecord)
-	fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Hours())   // 1.5 hours difference between the two times in hours (1.5)
-	fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes()) // 90 minutes difference between the two times in minutes (90)
-	fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Seconds()) // 5400 seconds difference between the two times in seconds (5400)
+	fmt.Println(problemrecord.CreatedAt)	
+	fmt.Println(problemrecord.CompletedAt) 
+	//fmt.Println(problemrecord.CompletedAt.Sub(problemrecord.CreatedAt).Hours())   // 1.5 hours difference between the two times in hours (1.5)
+	//fmt.Sprintf("2023-01-23 10:01:10").Sub("2023-01-23 10:53:46").Hours()
+	//fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes()) // 90 minutes difference between the two times in minutes (90)
+	//fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Seconds()) // 5400 seconds difference between the two times in seconds (5400)
 
-	return c.JSON(fiber.Map{"time": problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Hours()})
+	//convert time to string
+	fmt.Println(problemrecord.CompletedAt.Sub(problemrecord.CreatedAt).String()) // 1h30m0s difference between the two times in string (1h30m0s)
+	//convert time to int
+	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Hours())) // 1 hours difference between the two times in int (1)
+	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes())) // 90 minutes difference between the two times in int (90)
+	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Seconds())) // 5400 seconds difference between the two times in int (5400)
+	
+
+
+	return c.JSON(fiber.Map{"time": problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).String()})
 }
 
 func DeleteProblemRecord(c *fiber.Ctx) error {
