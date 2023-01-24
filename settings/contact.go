@@ -90,7 +90,7 @@ func CreateContact(c *fiber.Ctx) error {
 func GetContactById(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfContactExists(productId) == false {
-		c.JSON("Product Not Found!")
+		c.JSON("Concact Not Found! ไม่พบช่องทางการติดต่อ")
 		return nil
 	}
 	var product entities.Contact
@@ -115,7 +115,7 @@ func GetContacts(c *fiber.Ctx) error {
 func UpdateContact(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfContactExists(productId) == false {
-		c.JSON("Product Not Found!")
+		c.JSON("Concact Not Found! ไม่พบช่องทางการติดต่อ")
 		//return nil
 	}
 	var product entities.Contact
@@ -133,11 +133,11 @@ func DeleteContact(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfContactExists(productId) == false {
 		c.Status(404)
-		c.JSON("Product Not Found!")
+		c.JSON("Concact Not Found! ไม่พบช่องทางการติดต่อ")
 	}
 	var product entities.Contact
 	database.Instance.Delete(&product, productId)
-	c.JSON("Product Deleted Successfully!")
+	c.JSON("Concact Deleted Successfully! ลบช่องทางการติดต่อสำเร็จ")
 
 	return nil
 }

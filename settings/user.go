@@ -28,7 +28,7 @@ func CreateUser(c *fiber.Ctx) error {
 func GetUserById(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfUserExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Operator Not Found! ไม่พบผู้รับผิดชอบ")
 	}
 	var product []entities.User
 	var systems []entities.System
@@ -73,7 +73,7 @@ func mapSystem(listStr string, systems []entities.System) []entities.System {
 func UpdateUser(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfUserExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Operator Not Found! ไม่พบผู้รับผิดชอบ")
 	}
 	var product entities.User
 	database.Instance.First(&product, productId)
@@ -85,12 +85,12 @@ func UpdateUser(c *fiber.Ctx) error {
 func DeleteUser(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfUserExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Operator Not Found! ไม่พบผู้รับผิดชอบ")
 	}
 	var product entities.User
 	database.Instance.First(&product, productId)
 	database.Instance.Delete(&product)
-	return c.JSON("Product Deleted!")
+	return c.JSON("Operator Deleted! ลบผู้รับผิดชอบเรียบร้อยแล้ว")
 }
 
 func checkIfUserExists(id string) bool {

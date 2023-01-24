@@ -22,7 +22,7 @@ func CreateSystem(c *fiber.Ctx) error {
 func GetSystemById(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfSystemExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("System Not Found! ไม่พบระบบ")
 	}
 	var product entities.System
 	database.Instance.First(&product, productId)
@@ -38,7 +38,7 @@ func GetSystems(c *fiber.Ctx) error {
 func UpdateSystem(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfSystemExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("System Not Found! ไม่พบระบบ")
 	}
 	var product entities.System
 	database.Instance.First(&product, productId)
@@ -50,12 +50,12 @@ func UpdateSystem(c *fiber.Ctx) error {
 func DeleteSystem(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfSystemExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("System Not Found! ไม่พบระบบ")
 	}
 	var product entities.System
 	database.Instance.First(&product, productId)
 	database.Instance.Delete(&product)
-	return c.JSON("Product Deleted!")
+	return c.JSON("System Deleted! ลบระบบแล้ว")
 }
 
 func checkIfSystemExists(id string) bool {

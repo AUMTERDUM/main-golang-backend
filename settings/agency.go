@@ -88,7 +88,7 @@ c.Set("Content-Type", "application/json")
 func GetAgencyById(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfAgencyExists(productId) == false { 
-		c.JSON("Product Not Found!")
+		c.JSON("Agency Not Found! ไม่พบข้อมูลของหน่วยงานที่ให้บริการ")
 		
 	}
 	var product entities.Agency
@@ -110,7 +110,7 @@ func GetAgencys(c *fiber.Ctx) error {
 func UpdateAgency(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfAgencyExists(productId) == false {
-		c.JSON("Product Not Found!")
+		c.JSON("Agency Not Found! ไม่พบข้อมูลของหน่วยงานที่ให้บริการ")
 		return nil
 	}
 	var product entities.Agency
@@ -127,12 +127,12 @@ func DeleteAgency(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfAgencyExists(productId) == false {
 		c.Status(http.StatusNotFound)
-		c.JSON("Product Not Found!")
+		c.JSON("Agency Not Found! ไม่พบข้อมูลของหน่วยงานที่ให้บริการ")
 		return nil
 	}
 	var product entities.Agency
 	database.Instance.Delete(&product, productId)
-	c.JSON("Product Deleted Successfully!")
+	c.JSON("Agency Deleted Successfully! ลบข้อมูลของหน่วยงานที่ให้บริการเรียบร้อยแล้ว")
 	return nil
 }
 

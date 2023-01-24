@@ -21,7 +21,7 @@ func CreateLevel(c *fiber.Ctx) error {
 func GetLevelById(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfLevelExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Level Not Found! ไม่พบระดับความรุนแรง")
 	}
 	var product entities.Level
 	database.Instance.First(&product, productId)
@@ -37,7 +37,7 @@ func GetLevels(c *fiber.Ctx) error {
 func UpdateLevel(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfLevelExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Level Not Found! ไม่พบระดับความรุนแรง")
 	}
 	var product entities.Level
 	database.Instance.First(&product, productId)
@@ -49,12 +49,12 @@ func UpdateLevel(c *fiber.Ctx) error {
 func DeleteLevel(c *fiber.Ctx) error {
 	productId := c.Params("id")
 	if checkIfLevelExists(productId) == false {
-		return c.JSON("Product Not Found!")
+		return c.JSON("Level Not Found! ไม่พบระดับความรุนแรง")
 	}
 	var product entities.Level
 	database.Instance.First(&product, productId)
 	database.Instance.Delete(&product)
-	return c.JSON("Product Deleted!")
+	return c.JSON("Level Deleted! ลบระดับความรุนแรงสำเร็จ")
 }
 
 func checkIfLevelExists(id string) bool {
