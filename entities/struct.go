@@ -19,6 +19,8 @@ type User struct {
 	Nickname   string   `gorm:"type:varchar(50)" json:"nickname"`
 	Systems    string   `json:"systems"`
 	ListSystem []System `json:"listsystems" gorm:"-"`
+	//Status	 string   `gorm:"type:varchar(50)" json:"status"`
+	Deleted gorm.DeletedAt
 }
 
 type MetaUser struct {
@@ -29,27 +31,32 @@ type MetaUser struct {
 type System struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Deleted gorm.DeletedAt
 }
 
 type Problemtype struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Deleted gorm.DeletedAt
 }
 
 type Level struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 	Time int    `json:"time"`
+	Deleted gorm.DeletedAt
 }
 
 type Contact struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Deleted gorm.DeletedAt
 }
 
 type Agency struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Deleted gorm.DeletedAt
 }
 
 
@@ -105,6 +112,7 @@ type Config struct {
 type Status struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+	Deleted gorm.DeletedAt
 }
 
 type Pageination struct {
@@ -154,6 +162,7 @@ type ProblemRecord struct {
 	Problemtypes []Problemtype `json:"problemtype" gorm:"-"`
 	Levels       []Level       `json:"levels" gorm:"-"`
 	Users        []User        `json:"operators" gorm:"-"`
+	Deleted gorm.DeletedAt
 }
 
 type Statuse struct {

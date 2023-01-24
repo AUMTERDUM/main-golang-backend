@@ -45,6 +45,7 @@ func GetUserById(c *fiber.Ctx) error {
 func GetUsers(c *fiber.Ctx) error {
 	var products []entities.User
 	var systems []entities.System
+	//database.Instance.Select("status").Where("status = ?","Inactive").Find(&products)
 	database.Instance.Find(&products)
 	database.Instance.Find(&systems)
 	for index, data := range products {
@@ -84,12 +85,10 @@ func UpdateUser(c *fiber.Ctx) error {
 
 func DeleteUser(c *fiber.Ctx) error {
 	productId := c.Params("id")
-	if checkIfUserExists(productId) == false {
-		return c.JSON("Operator Not Found! ไม่พบผู้รับผิดชอบ")
+	if checkIfSystemExists(productId) == false {
+		return c.JSON("Operator Not Found! ไม่พบระบบ")
 	}
-	var product entities.User
-	database.Instance.First(&product, productId)
-	database.Instance.Delete(&product)
+	database.Instance.Delete(&entities.User{}, productId)
 	return c.JSON("Operator Deleted! ลบผู้รับผิดชอบเรียบร้อยแล้ว")
 }
 
@@ -102,4 +101,10 @@ func checkIfUserExists(id string) bool {
 	return true
 }
 
+//DeleteUser But not Delete in Database  just for test
 
+func DeleteUserButNotDelete(c *fiber.Ctx) error {
+	productId := c.Params("id")
+	database.Instance.Delete(&entities.User{}, productId)
+	return c.JSON("Operator Deleted! ลบผู้รับผิดชอบเรียบร้อยแล้ว")
+}

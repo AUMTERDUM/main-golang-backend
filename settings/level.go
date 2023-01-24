@@ -52,8 +52,7 @@ func DeleteLevel(c *fiber.Ctx) error {
 		return c.JSON("Level Not Found! ไม่พบระดับความรุนแรง")
 	}
 	var product entities.Level
-	database.Instance.First(&product, productId)
-	database.Instance.Delete(&product)
+	database.Instance.Delete(&product, productId)
 	return c.JSON("Level Deleted! ลบระดับความรุนแรงสำเร็จ")
 }
 

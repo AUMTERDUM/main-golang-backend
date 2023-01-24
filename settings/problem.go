@@ -53,8 +53,7 @@ func DeleteProblem(c *fiber.Ctx) error {
 		return c.JSON("ProblemType Not Found! ไม่พบประเภทของปัญหา")
 	}
 	var product entities.Problemtype
-	database.Instance.First(&product, productId)
-	database.Instance.Delete(&product)
+	database.Instance.Delete(&product, productId)
 	return c.JSON("ProbelmType Deleted! ลบประเภทของปัญหาสำเร็จ")
 }
 
