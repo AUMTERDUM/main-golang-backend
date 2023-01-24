@@ -9,11 +9,11 @@ import (
 type Config struct {
 	Port           string `mapstructure:"port"`
 	ConnectionString string `mapstructure:"connection_string"`
-}
+} // Config struct for the application configurations to be loaded from config.json file using Viper package
 
-var AppConfig *Config
+var AppConfig *Config // AppConfig is the global variable for the application configurations
 
-
+// LoadAppConfig loads the application configurations from config.json file using Viper package
 func LoadAppConfig() {
 	log.Println("Loading Server Configurations...")
 	viper.AddConfigPath(".")

@@ -89,20 +89,15 @@ func CreateProblemRecord(c *fiber.Ctx) error {
 		File_extension: ext,
 		File_size:      int(size),
 	}
-	entities.ReadJsonFormLocal()
-
-	// database.Instance.Create(&problemrecord)
-	// c.Set("Content-Type", "application/json")
-	// return c.JSON(problemrecord)
+	entities.ReadJsonFormLocal()//read json file from local and save to database table
 	database.Instance.Create(&problemrecord)
 	return c.JSON(fiber.Map{"id": problemrecord.ID, "file_name": problemrecord.File_name, "path_file": problemrecord.Path_file, "agency": problemrecord.Agency, "contact": problemrecord.Contact, "problem": problemrecord.Problem, "level": problemrecord.Level, "informer": problemrecord.Informer, "informermessage": problemrecord.Informermessage, "system": problemrecord.System, "problemtype": problemrecord.Problemtype, "created_at": problemrecord.CreatedAt, "status": problemrecord.Status, "file_extension": problemrecord.File_extension, "file_size": problemrecord.File_size, "message": "Create Successfully"})
 	
-	//return c.JSON(problemrecord)
+	
 
 }
 
 func GetProblemRecords(c *fiber.Ctx) error {
-	//var problemrecords []entities.ProblemRecord
 	var repo entities.Meta
 	var systems []entities.System
 	var contacts []entities.Contact
@@ -120,19 +115,14 @@ func GetProblemRecords(c *fiber.Ctx) error {
 		limit = 10
 	}
 	offset := (page - 1) * limit
-	// var list []entities.ProblemRecord
 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
-	database.Instance.Order("created_at desc").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
+	database.Instance.Order("created_at desc").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //order by created_at desc
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
 	database.Instance.Find(&problemtype)
 	database.Instance.Find(&agencies)
 	database.Instance.Find(&levels)
 	database.Instance.Find(&users)
-
-	// for index, data := range systems {
-	// 	fmt.Println(data.Name, index)
-	// }as
 
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
@@ -167,8 +157,8 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	return c.JSON(repo)
 }
 
+//just for test
 func GetProblemRecordByTime(c *fiber.Ctx) error {
-	//var problemrecords []entities.ProblemRecord
 	var repo entities.Meta
 	var systems []entities.System
 	var contacts []entities.Contact
@@ -186,8 +176,7 @@ func GetProblemRecordByTime(c *fiber.Ctx) error {
 		limit = 10
 	}
 	offset := (page - 1) * limit
-	// var list []entities.ProblemRecord
-	database.Instance.Order("created_at").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
+	database.Instance.Order("created_at").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //.Where("created_at BETWEEN ? AND ?", "2021-01-01", "2021-01-31")
 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
@@ -196,9 +185,6 @@ func GetProblemRecordByTime(c *fiber.Ctx) error {
 	database.Instance.Find(&levels)
 	database.Instance.Find(&users)
 
-	// for index, data := range systems {
-	// 	fmt.Println(data.Name, index)
-	// }as
 
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
@@ -227,7 +213,7 @@ func GetProblemRecordByTime(c *fiber.Ctx) error {
 		}
 	}
 
-	repo.Pageination = Pagination(c)
+	repo.Pageination = Pagination(c) // ส่งค่า pageination ไปให้ Pagination ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.Pageination แล้วส่งค่าไปให้ client ด้วย
 	c.JSON(repo)
 	c.Set("Content-Type", "application/json")
 	return c.JSON(repo)
@@ -237,8 +223,6 @@ func GetProblemRecordByTime(c *fiber.Ctx) error {
 func GetProblemById(c *fiber.Ctx) error {
 	id := (c.Params("id"))
 	fmt.Printf("id: %s ", id)
-	//var problemrecord entities.ProblemRecord
-	//database.Instance.Preload("Statuse").First(&problemrecord, id)
 	var repo entities.Meta
 	var systems []entities.System
 	var contacts []entities.Contact
@@ -246,8 +230,7 @@ func GetProblemById(c *fiber.Ctx) error {
 	var agencies []entities.Agency
 	var levels []entities.Level
 	var users []entities.User
-	// var list []entities.ProblemRecord
-	database.Instance.Preload("Statuse").First(&repo.ProblemRecord, fmt.Sprintf(`id = '%s'`, id))
+	database.Instance.Preload("Statuse").First(&repo.ProblemRecord, fmt.Sprintf(`id = '%s'`, id)) // ค้นหาข้อมูลจาก id ที่ส่งมา แล้วเก็บไว้ใน repo.ProblemRecord
 	//database.Instance.Preload(&systems).First(&repo.ProblemRecord)
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
@@ -255,10 +238,6 @@ func GetProblemById(c *fiber.Ctx) error {
 	database.Instance.Find(&agencies)
 	database.Instance.Find(&levels)
 	database.Instance.Find(&users)
-
-	// for index, data := range systems {
-	// 	fmt.Println(data.Name, index)
-	// }
 
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
@@ -281,10 +260,10 @@ func GetProblemById(c *fiber.Ctx) error {
 	}
 
 	for index, data5 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users)
+		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users) // ส่งค่า user ไปให้ MapUser ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.ProblemRecord[index].Users
 		for index, data := range users {
-			users[index].ListSystem = mapSystem(data.Systems, systems)
-		}
+			users[index].ListSystem = mapSystem(data.Systems, systems) // ส่งค่า system ไปให้ mapSystem ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน users[index].ListSystem
+		} // แล้วเก็บไว้ใน repo.ProblemRecord[index].Users
 	}
 
 	
@@ -294,12 +273,15 @@ func GetProblemById(c *fiber.Ctx) error {
 }
 
 func mapSystem(listStr string, systems []entities.System) []entities.System {
-	list := strings.Split(listStr, ",")
+	// Split the comma-separated list of system IDs into a slice of strings
+list := strings.Split(listStr, ",")
 	var data []entities.System
+	// Loop over the list of strings and compare each ID to the system ID
 	for _, v := range list {
 		for _, s := range systems {
 			id, _ := strconv.Atoi(v)
 			if id == s.ID {
+				// If there is a match, append the system data to the data slice
 				data = append(data, s)
 			}
 		}
@@ -418,8 +400,6 @@ func UpdateProblemRecord(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{"operator": problemrecord.Operator, "status": problemrecord.Status, "sender_at": problemrecord.SenderAt, "message": "Update Successfully"})
-	// database.Instance.Save(&problemrecord)
-	//return c.JSON(problemrecord)
 
 }
 
@@ -439,18 +419,14 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 			"message": "Record not found",
 		})
 	}
-	//(problemrecord.CompletedAt.Sub(problemrecord.CreatedAt).String())
-	//t := time.Now()
-	// fmt.Println(t)
-	// fmt.Println(data_problem.CreatedAt)
-	//hee := (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String()
+
 	problemrecord := entities.ProblemRecord{
 		Casuseproblem: Casuseproblem,
 		Solution:      Solution,
 		Suggestion:    Suggestion,
 		CompletedAt:   time.Now(),
 		Status:        3,
-		Time: 		   (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
+		Time: 		   (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(), //คำนวนเวลา วันที่เส็จ-วันที่สร้าง แล้วเก็บไว้ในตัวแปร Time ในตาราง ProblemRecord ในฐานข้อมูล
 	}
 
 
@@ -517,8 +493,8 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 	//return c.JSON(problemrecord)
 }
 
-//calculate time
 
+//calculate time ไม่น่าจะได้ใช้
 func CalculateTime(c *fiber.Ctx) error {
 
 	
@@ -561,6 +537,7 @@ func DeleteProblemRecord(c *fiber.Ctx) error {
 	})
 }
 
+//ค้นหาข้อมูล แบบเลือกเฉพาะ 1 อย่าง แล้วค้นหาแล้วแสดงผลทั้งหมดที่เจอออกมาแบบเป็น array ที่เป็น json 
 func GetProblemRecordByAgency(c *fiber.Ctx) error {
 	agency := c.Params("agency")
 	var problemrecord entities.ProblemRecord
@@ -660,8 +637,7 @@ func GetProblemRecordByProblemdescription(c *fiber.Ctx) error {
 	return nil
 }
 
-//pagination
-
+//pagination การจัดหน้า
 func Pagination(c *fiber.Ctx) entities.Pageination {
 	var problemrecord entities.ProblemRecord
 	var total_row int64

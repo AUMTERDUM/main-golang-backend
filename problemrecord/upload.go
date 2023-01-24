@@ -1,4 +1,4 @@
-//not use
+//not use just for test
 package problemrecord
 
 import (

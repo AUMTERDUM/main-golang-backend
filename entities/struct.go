@@ -54,9 +54,12 @@ type Agency struct {
 
 
 func (book *ProblemRecord) BeforeCreate(tx *gorm.DB) (err error) {
+	//create uuid
 	uuidWithHyphen := uuid.New()
 	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)
+	//read setting.json
 	config := ReadJsonFormLocal()
+	//set id
 	uuid = config.Code + fmt.Sprintf("%04d", config.CurrentId)
 	//update current id
 	config.CurrentId = config.CurrentId + 1
@@ -66,13 +69,10 @@ func (book *ProblemRecord) BeforeCreate(tx *gorm.DB) (err error) {
 		fmt.Println(err)
 	}
 	defer jsonFile.Close()
-
 	byteValue, _ := json.Marshal(config)
 	fmt.Println(string(byteValue))
 	jsonFile.Write(byteValue)
-
-
-
+	//set id
 	book.ID = uuid
 	return
 }

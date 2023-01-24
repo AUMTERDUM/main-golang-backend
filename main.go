@@ -18,22 +18,11 @@ import (
 var DB *gorm.DB
 
 func main() {
-
-	// cors := cors.New(cors.Options{
-	// 	AllowedOrigins: []string{"*"},
-	// 	AllowedMethods: []string{
-	// 		http.MethodPost,
-	// 		http.MethodGet,
-	// 	},
-	// 	AllowedHeaders:   []string{"*"},
-	// 	AllowCredentials: false,
-	// })
-
 	// Load Configurations from config.json using Viper
 	configIP.LoadAppConfig()
 
 	// Initialize Database
-	database.Connect(configIP.AppConfig.ConnectionString)
+	database.Connect(configIP.AppConfig.ConnectionString) // Connect to Database
 	database.MigrateUSER()
 	database.MigrateSYSTEM()
 	database.MigratePROBLEM()
