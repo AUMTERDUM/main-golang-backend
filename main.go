@@ -125,4 +125,6 @@ func RegisterProductRoutesfiber(router *fiber.App) {
 	router.Get("/problemrecordbyimformermessage/:id", problemrecord.GetProblemRecordByInformermessage)
 	router.Get("/problemrecordbyproblemtype/:id", problemrecord.GetProblemRecordByProblemtype)
 
+	//test
+	router.Get("/problemrecordbytime", problemrecord.GetProblemRecordByTime)
 }
