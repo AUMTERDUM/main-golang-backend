@@ -89,11 +89,9 @@ func CreateProblemRecord(c *fiber.Ctx) error {
 		File_extension: ext,
 		File_size:      int(size),
 	}
-	entities.ReadJsonFormLocal()//read json file from local and save to database table
+	entities.ReadJsonFormLocal() //read json file from local and save to database table
 	database.Instance.Create(&problemrecord)
 	return c.JSON(fiber.Map{"id": problemrecord.ID, "file_name": problemrecord.File_name, "path_file": problemrecord.Path_file, "agency": problemrecord.Agency, "contact": problemrecord.Contact, "problem": problemrecord.Problem, "level": problemrecord.Level, "informer": problemrecord.Informer, "informermessage": problemrecord.Informermessage, "system": problemrecord.System, "problemtype": problemrecord.Problemtype, "created_at": problemrecord.CreatedAt, "status": problemrecord.Status, "file_extension": problemrecord.File_extension, "file_size": problemrecord.File_size, "message": "Create Successfully"})
-	
-	
 
 }
 
@@ -118,119 +116,50 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	keyword := c.Query("keyword", "")
 	fmt.Println(keyword)
 
-
 	offset := (page - 1) * limit
 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
-	database.Instance.Order("created_at desc").Preload("Statuse").Where("id like ? ","%" + keyword + "%").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //order by created_at desc
+	database.Instance.Order("created_at desc").Preload("Statuse").Where("id like ? ", "%"+keyword+"%").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //order by created_at desc
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
 	database.Instance.Find(&problemtype)
 	database.Instance.Find(&agencies)
 	database.Instance.Find(&levels)
 	database.Instance.Find(&users)
-	database.Instance.Where("id like ? ","%" + keyword + "%").Model(&repo.ProblemRecord).Count(&total_row)
-	
+
+	database.Instance.Where("id like ? ", "%"+keyword+"%").Model(&repo.ProblemRecord).Count(&total_row)
+
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
-	}
-
-	for index, data1 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact, contacts)
-	}
-
-	for index, data2 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype, problemtype)
-	}
-
-	for index, data3 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency, agencies)
-	}
-
-	for index, data4 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Levels = MapLevel(data4.Level, levels)
-	}
-
-	for index, data5 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users)
+		repo.ProblemRecord[index].Contacts = MapContact(data.Contact, contacts)
+		repo.ProblemRecord[index].Problemtypes = MapProblemType(data.Problemtype, problemtype)
+		repo.ProblemRecord[index].Agencies = MapAgnecy(data.Agency, agencies)
+		repo.ProblemRecord[index].Levels = MapLevel(data.Level, levels)
+		repo.ProblemRecord[index].Users = MapUser(data.Operator, users)
 		for index, data := range users {
 			users[index].ListSystem = mapSystem(data.Systems, systems)
 		}
+		repo.ProblemRecord[index].TmpCreateAt = repo.ProblemRecord[index].CreatedAt.Unix()
+
+		if repo.ProblemRecord[index].SenderAt.IsZero() {
+			repo.ProblemRecord[index].TmpSenderAt = 0
+		} else {
+			repo.ProblemRecord[index].TmpSenderAt = repo.ProblemRecord[index].SenderAt.Unix()
+		}
+
+		if repo.ProblemRecord[index].CompletedAt.IsZero() {
+			repo.ProblemRecord[index].TmpCompletedAt = 0
+		} else {
+			repo.ProblemRecord[index].TmpCompletedAt = repo.ProblemRecord[index].CompletedAt.Unix()
+		}
 	}
 
-	repo.Pageination = Pagination(total_row,page ,limit)
+	repo.ProblemRecord[0].SenderAt.IsZero()
+	fmt.Println(repo.ProblemRecord[0].SenderAt.IsZero())
+	repo.Pageination = Pagination(total_row, page, limit)
 	c.JSON(repo)
 	c.Set("Content-Type", "application/json")
 	return c.JSON(repo)
 }
-
-//just for test
-// func GetProblemRecordByTime(c *fiber.Ctx) error {
-// 	var repo entities.Meta
-// 	var systems []entities.System
-// 	var contacts []entities.Contact
-// 	var problemtype []entities.Problemtype
-// 	var agencies []entities.Agency
-// 	var levels []entities.Level
-// 	var users []entities.User
-
-// 	page, err := strconv.Atoi(c.Query("page", "1"))
-// 	if err != nil {
-// 		page = 1
-// 	}
-// 	limit, err := strconv.Atoi(c.Query("limit", "10"))
-// 	if err != nil {
-// 		limit = 10
-// 	}
-
-// 	keyword := c.Query("keyword", "")
-// 	fmt.Println(keyword)
-	
-
-
-// 	offset := (page - 1) * limit
-// 	database.Instance.Order("created_at").Preload("Statuse").Where("id", keyword).Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //.Where("created_at BETWEEN ? AND ?", "2021-01-01", "2021-01-31")
-// 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
-// 	database.Instance.Find(&systems)
-// 	database.Instance.Find(&contacts)
-// 	database.Instance.Find(&problemtype)
-// 	database.Instance.Find(&agencies)
-// 	database.Instance.Find(&levels)
-// 	database.Instance.Find(&users)
-
-
-// 	for index, data := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
-// 	}
-
-// 	for index, data1 := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact, contacts)
-// 	}
-
-// 	for index, data2 := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype, problemtype)
-// 	}
-
-// 	for index, data3 := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency, agencies)
-// 	}
-
-// 	for index, data4 := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Levels = MapLevel(data4.Level, levels)
-// 	}
-
-// 	for index, data5 := range repo.ProblemRecord {
-// 		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users)
-// 		for index, data := range users {
-// 			users[index].ListSystem = mapSystem(data.Systems, systems)
-// 		}
-// 	}
-
-// 	repo.Pageination = Pagination(c) // ส่งค่า pageination ไปให้ Pagination ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.Pageination แล้วส่งค่าไปให้ client ด้วย
-// 	c.JSON(repo)
-// 	c.Set("Content-Type", "application/json")
-// 	return c.JSON(repo)
-// }
-
 
 func GetProblemById(c *fiber.Ctx) error {
 	id := (c.Params("id"))
@@ -253,32 +182,33 @@ func GetProblemById(c *fiber.Ctx) error {
 
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
-	}
-
-	for index, data1 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact, contacts)
-	}
-
-	for index, data2 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype, problemtype)
-	}
-
-	for index, data3 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency, agencies)
-	}
-
-	for index, data4 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Levels = MapLevel(data4.Level, levels)
-	}
-
-	for index, data5 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users) // ส่งค่า user ไปให้ MapUser ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.ProblemRecord[index].Users
+		repo.ProblemRecord[index].Contacts = MapContact(data.Contact, contacts)
+		repo.ProblemRecord[index].Problemtypes = MapProblemType(data.Problemtype, problemtype)
+		repo.ProblemRecord[index].Agencies = MapAgnecy(data.Agency, agencies)
+		repo.ProblemRecord[index].Levels = MapLevel(data.Level, levels)
+		repo.ProblemRecord[index].Users = MapUser(data.Operator, users) // ส่งค่า user ไปให้ MapUser ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.ProblemRecord[index].Users
 		for index, data := range users {
 			users[index].ListSystem = mapSystem(data.Systems, systems) // ส่งค่า system ไปให้ mapSystem ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน users[index].ListSystem
 		} // แล้วเก็บไว้ใน repo.ProblemRecord[index].Users
+
+		repo.ProblemRecord[index].TmpCreateAt = repo.ProblemRecord[index].CreatedAt.Unix()
+
+		if repo.ProblemRecord[index].SenderAt.IsZero() {
+			repo.ProblemRecord[index].TmpSenderAt = 0
+		} else {
+			repo.ProblemRecord[index].TmpSenderAt = repo.ProblemRecord[index].SenderAt.Unix()
+		}
+
+		if repo.ProblemRecord[index].CompletedAt.IsZero() {
+			repo.ProblemRecord[index].TmpCompletedAt = 0
+		} else {
+			repo.ProblemRecord[index].TmpCompletedAt = repo.ProblemRecord[index].CompletedAt.Unix()
+		}
+
 	}
 
-	
+	//fmt.Printf("%#v" ,repo.ProblemRecord)
+
 	c.JSON(repo)
 	c.Set("Content-Type", "application/json")
 	return c.JSON(repo)
@@ -286,7 +216,7 @@ func GetProblemById(c *fiber.Ctx) error {
 
 func mapSystem(listStr string, systems []entities.System) []entities.System {
 	// Split the comma-separated list of system IDs into a slice of strings
-list := strings.Split(listStr, ",")
+	list := strings.Split(listStr, ",")
 	var data []entities.System
 	// Loop over the list of strings and compare each ID to the system ID
 	for _, v := range list {
@@ -420,7 +350,6 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 	Casuseproblem := c.FormValue("casuseproblem")
 	Solution := c.FormValue("solution")
 	Suggestion := c.FormValue("suggestion")
-	
 
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
@@ -438,10 +367,8 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 		Suggestion:    Suggestion,
 		CompletedAt:   time.Now(),
 		Status:        3,
-		Time: 		   (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(), //คำนวนเวลา วันที่เส็จ-วันที่สร้าง แล้วเก็บไว้ในตัวแปร Time ในตาราง ProblemRecord ในฐานข้อมูล
+		Time:          (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
 	}
-
-
 
 	if err := c.BodyParser(&problemrecord); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -455,9 +382,7 @@ func CompletedProblemRecord(c *fiber.Ctx) error {
 	}
 
 	//problemrecord.Time = time.Now().Sub(problemrecord.SenderAt).String()
-	CalculateTime(c) 
-
-	
+	//CalculateTime(c)
 
 	return c.JSON(fiber.Map{"casuseproblem": problemrecord.Casuseproblem, "solution": problemrecord.Solution, "suggestion": problemrecord.Suggestion, "status": problemrecord.Status, "completed_at": problemrecord.CompletedAt, "message": "Update Successfully", "time": problemrecord.Time})
 	//database.Instance.Where("id = ?",id).Save(&problemrecord)
@@ -469,7 +394,6 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 	Casuseproblem := c.FormValue("casuseproblem")
 	Solution := c.FormValue("solution")
 	Suggestion := c.FormValue("suggestion")
-
 
 	var data_problem entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&data_problem)
@@ -486,7 +410,7 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 		Suggestion:    Suggestion,
 		CompletedAt:   time.Now(),
 		Status:        4,
-		Time :         (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
+		Time:          (data_problem.CompletedAt).Sub(data_problem.CreatedAt).String(),
 	}
 
 	if err := c.BodyParser(&problemrecord); err != nil {
@@ -505,18 +429,16 @@ func CancalProblemRecord(c *fiber.Ctx) error {
 	//return c.JSON(problemrecord)
 }
 
-
-//calculate time ไม่น่าจะได้ใช้
+// calculate time ไม่น่าจะได้ใช้
 func CalculateTime(c *fiber.Ctx) error {
 
-	
 	id := c.Params("id")
 	var problemrecord entities.ProblemRecord
 	database.Instance.Where("id = ?", id).Find(&problemrecord)
 	c.Set("Content-Type", "application/json")
 	c.JSON(problemrecord)
-	fmt.Println(problemrecord.CreatedAt)	
-	fmt.Println(problemrecord.CompletedAt) 
+	fmt.Println(problemrecord.CreatedAt)
+	fmt.Println(problemrecord.CompletedAt)
 	//fmt.Println(problemrecord.CompletedAt.Sub(problemrecord.CreatedAt).Hours())   // 1.5 hours difference between the two times in hours (1.5)
 	//fmt.Sprintf("2023-01-23 10:01:10").Sub("2023-01-23 10:53:46").Hours()
 	//fmt.Println(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes()) // 90 minutes difference between the two times in minutes (90)
@@ -528,8 +450,6 @@ func CalculateTime(c *fiber.Ctx) error {
 	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Hours())) // 1 hours difference between the two times in int (1)
 	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Minutes())) // 90 minutes difference between the two times in int (90)
 	//fmt.Println(int(problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).Seconds())) // 5400 seconds difference between the two times in int (5400)
-	
-
 
 	return c.JSON(fiber.Map{"time": problemrecord.CreatedAt.Sub(problemrecord.CompletedAt).String()})
 }
@@ -549,7 +469,7 @@ func DeleteProblemRecord(c *fiber.Ctx) error {
 	})
 }
 
-//ค้นหาข้อมูล แบบเลือกเฉพาะ 1 อย่าง แล้วค้นหาแล้วแสดงผลทั้งหมดที่เจอออกมาแบบเป็น array ที่เป็น json 
+// ค้นหาข้อมูล แบบเลือกเฉพาะ 1 อย่าง แล้วค้นหาแล้วแสดงผลทั้งหมดที่เจอออกมาแบบเป็น array ที่เป็น json
 func GetProblemRecordByAgency(c *fiber.Ctx) error {
 	agency := c.Params("agency")
 	var problemrecord entities.ProblemRecord
@@ -649,24 +569,8 @@ func GetProblemRecordByProblemdescription(c *fiber.Ctx) error {
 	return nil
 }
 
-//pagination การจัดหน้า
-func Pagination(total_row int64,page int, limit int) entities.Pageination {
-
-	// var problemrecord entities.ProblemRecord
-	// var total_row int64
-	// var page, limit int
-	// var err error
-	// page, err = strconv.Atoi(c.Query("page", "1"))
-	// if err != nil {
-	// 	page = 1
-	// }
-	// limit, err = strconv.Atoi(c.Query("limit", "10"))
-	// if err != nil {
-	// 	limit = 10
-	// }
-
-	// keyword := c.Query("keyword", "")
-	
+// pagination การจัดหน้า
+func Pagination(total_row int64, page int, limit int) entities.Pageination {
 
 	return entities.Pageination{
 		Page:     page,
@@ -675,4 +579,3 @@ func Pagination(total_row int64,page int, limit int) entities.Pageination {
 		TotalRow: total_row,
 	}
 }
-

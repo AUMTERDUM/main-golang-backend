@@ -115,7 +115,6 @@ func RegisterProductRoutesfiber(router *fiber.App) {
 	router.Get("/problemrecordbyproblemtype/:id", problemrecord.GetProblemRecordByProblemtype)
 
 	//test
-	//router.Get("/problemrecordbytime", problemrecord.GetProblemRecordByTime)
 	router.Delete("/usersTEST/:id", settings.DeleteUserButNotDelete)
 }
 

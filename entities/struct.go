@@ -29,36 +29,35 @@ type MetaUser struct {
 }
 
 type System struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
 	Deleted gorm.DeletedAt
 }
 
 type Problemtype struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
 	Deleted gorm.DeletedAt
 }
 
 type Level struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	Time int    `json:"time"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
+	Time    int    `json:"time"`
 	Deleted gorm.DeletedAt
 }
 
 type Contact struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
 	Deleted gorm.DeletedAt
 }
 
 type Agency struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
 	Deleted gorm.DeletedAt
 }
-
 
 func (book *ProblemRecord) BeforeCreate(tx *gorm.DB) (err error) {
 	//create uuid
@@ -110,8 +109,8 @@ type Config struct {
 }
 
 type Status struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID      int    `json:"id"`
+	Name    string `json:"name"`
 	Deleted gorm.DeletedAt
 }
 
@@ -128,8 +127,8 @@ type Meta struct {
 }
 
 type ProblemRecord struct {
-	ID     string `gorm:"primaryKey" json:"id"`
-	Agency string `gorm:"type:varchar(50)" json:"agency"`
+	ID              string `gorm:"primaryKey" json:"id"`
+	Agency          string `gorm:"type:varchar(50)" json:"agency"`
 	Contact         string `gorm:"type:varchar(50)" json:"contact"`
 	Informer        string `gorm:"type:varchar(50)" json:"informer"`
 	Informermessage string `gorm:"type:varchar(50)" json:"informermessage"`
@@ -149,20 +148,24 @@ type ProblemRecord struct {
 	Operator      string `gorm:"type:varchar(50)" json:"operator"`
 
 	//CreatedAt   time.Time `gorm:"<-:crate;type:timestamp" json:"created_at"`
-	CreatedAt   time.Time `gorm:"column:created_at;type:TIMESTAMP;DEFAULT:CURRENT_TIMESTAMP;not null;" json:"created_at"`
-	SenderAt    time.Time `gorm:"column:sender_at;type:TIMESTAMP;DEFAULT:CURRENT_TIMESTAMP;not null;" json:"sender_at"`
-	CompletedAt time.Time `gorm:"column:completed_at;type:TIMESTAMP;DEFAULT:CURRENT_TIMESTAMP;not null;" json:"completed_at"`
+	//CreatedAt   time.Time `gorm:"column:created_at;type:TIMESTAMP;DEFAULT:CURRENT_TIMESTAMP;not null;" json:"created_at"`
+	CreatedAt   time.Time `gorm:"column:created_at" json:"-"`
+	SenderAt    time.Time `gorm:"column:sender_at;type:TIMESTAMP NULL;DEFAULT:NULL;" json:"-"`
+	CompletedAt time.Time `gorm:"column:completed_at;type:TIMESTAMP NULL;DEFAULT:NULL;" json:"-"`
 
-	Time         string         `json:"time"`
-	Status       int           `json:"-"`
-	Statuse      Statuse       `json:"status" gorm:"foreignKey:Status;references:Id"`
-	Systems      []System      `json:"systems" gorm:"-"`
-	Contacts     []Contact     `json:"contacts" gorm:"-"`
-	Agencies     []Agency      `json:"agencies" gorm:"-"`
-	Problemtypes []Problemtype `json:"problemtype" gorm:"-"`
-	Levels       []Level       `json:"levels" gorm:"-"`
-	Users        []User        `json:"operators" gorm:"-"`
-	Deleted gorm.DeletedAt
+	Time           string        `json:"time"`
+	Status         int           `json:"-"`
+	Statuse        Statuse       `json:"status" gorm:"foreignKey:Status;references:Id"`
+	Systems        []System      `json:"systems" gorm:"-"`
+	Contacts       []Contact     `json:"contacts" gorm:"-"`
+	Agencies       []Agency      `json:"agencies" gorm:"-"`
+	Problemtypes   []Problemtype `json:"problemtype" gorm:"-"`
+	Levels         []Level       `json:"levels" gorm:"-"`
+	Users          []User        `json:"operators" gorm:"-"`
+	Deleted        gorm.DeletedAt
+	TmpCreateAt    int64 `json:"created_at" gorm:"-"`
+	TmpSenderAt    int64 `json:"sender_at" gorm:"-"`
+	TmpCompletedAt int64 `json:"completed_at" gorm:"-"`
 }
 
 type Statuse struct {
