@@ -105,7 +105,7 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	var agencies []entities.Agency
 	var levels []entities.Level
 	var users []entities.User
-
+	var total_row int64
 	page, err := strconv.Atoi(c.Query("page", "1"))
 	if err != nil {
 		page = 1
@@ -114,16 +114,22 @@ func GetProblemRecords(c *fiber.Ctx) error {
 	if err != nil {
 		limit = 10
 	}
+
+	keyword := c.Query("keyword", "")
+	fmt.Println(keyword)
+
+
 	offset := (page - 1) * limit
 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
-	database.Instance.Order("created_at desc").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //order by created_at desc
+	database.Instance.Order("created_at desc").Preload("Statuse").Where("id like ? ","%" + keyword + "%").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //order by created_at desc
 	database.Instance.Find(&systems)
 	database.Instance.Find(&contacts)
 	database.Instance.Find(&problemtype)
 	database.Instance.Find(&agencies)
 	database.Instance.Find(&levels)
 	database.Instance.Find(&users)
-
+	database.Instance.Where("id like ? ","%" + keyword + "%").Model(&repo.ProblemRecord).Count(&total_row)
+	
 	for index, data := range repo.ProblemRecord {
 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
 	}
@@ -151,73 +157,79 @@ func GetProblemRecords(c *fiber.Ctx) error {
 		}
 	}
 
-	repo.Pageination = Pagination(c)
+	repo.Pageination = Pagination(total_row,page ,limit)
 	c.JSON(repo)
 	c.Set("Content-Type", "application/json")
 	return c.JSON(repo)
 }
 
 //just for test
-func GetProblemRecordByTime(c *fiber.Ctx) error {
-	var repo entities.Meta
-	var systems []entities.System
-	var contacts []entities.Contact
-	var problemtype []entities.Problemtype
-	var agencies []entities.Agency
-	var levels []entities.Level
-	var users []entities.User
+// func GetProblemRecordByTime(c *fiber.Ctx) error {
+// 	var repo entities.Meta
+// 	var systems []entities.System
+// 	var contacts []entities.Contact
+// 	var problemtype []entities.Problemtype
+// 	var agencies []entities.Agency
+// 	var levels []entities.Level
+// 	var users []entities.User
 
-	page, err := strconv.Atoi(c.Query("page", "1"))
-	if err != nil {
-		page = 1
-	}
-	limit, err := strconv.Atoi(c.Query("limit", "10"))
-	if err != nil {
-		limit = 10
-	}
-	offset := (page - 1) * limit
-	database.Instance.Order("created_at").Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //.Where("created_at BETWEEN ? AND ?", "2021-01-01", "2021-01-31")
-	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
-	database.Instance.Find(&systems)
-	database.Instance.Find(&contacts)
-	database.Instance.Find(&problemtype)
-	database.Instance.Find(&agencies)
-	database.Instance.Find(&levels)
-	database.Instance.Find(&users)
+// 	page, err := strconv.Atoi(c.Query("page", "1"))
+// 	if err != nil {
+// 		page = 1
+// 	}
+// 	limit, err := strconv.Atoi(c.Query("limit", "10"))
+// 	if err != nil {
+// 		limit = 10
+// 	}
+
+// 	keyword := c.Query("keyword", "")
+// 	fmt.Println(keyword)
+	
 
 
-	for index, data := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
-	}
+// 	offset := (page - 1) * limit
+// 	database.Instance.Order("created_at").Preload("Statuse").Where("id", keyword).Limit(limit).Offset(offset).Find(&repo.ProblemRecord) //.Where("created_at BETWEEN ? AND ?", "2021-01-01", "2021-01-31")
+// 	//database.Instance.Preload("Statuse").Limit(limit).Offset(offset).Find(&repo.ProblemRecord)
+// 	database.Instance.Find(&systems)
+// 	database.Instance.Find(&contacts)
+// 	database.Instance.Find(&problemtype)
+// 	database.Instance.Find(&agencies)
+// 	database.Instance.Find(&levels)
+// 	database.Instance.Find(&users)
 
-	for index, data1 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact, contacts)
-	}
 
-	for index, data2 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype, problemtype)
-	}
+// 	for index, data := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Systems = mapSystem(data.System, systems)
+// 	}
 
-	for index, data3 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency, agencies)
-	}
+// 	for index, data1 := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Contacts = MapContact(data1.Contact, contacts)
+// 	}
 
-	for index, data4 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Levels = MapLevel(data4.Level, levels)
-	}
+// 	for index, data2 := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Problemtypes = MapProblemType(data2.Problemtype, problemtype)
+// 	}
 
-	for index, data5 := range repo.ProblemRecord {
-		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users)
-		for index, data := range users {
-			users[index].ListSystem = mapSystem(data.Systems, systems)
-		}
-	}
+// 	for index, data3 := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Agencies = MapAgnecy(data3.Agency, agencies)
+// 	}
 
-	repo.Pageination = Pagination(c) // ส่งค่า pageination ไปให้ Pagination ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.Pageination แล้วส่งค่าไปให้ client ด้วย
-	c.JSON(repo)
-	c.Set("Content-Type", "application/json")
-	return c.JSON(repo)
-}
+// 	for index, data4 := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Levels = MapLevel(data4.Level, levels)
+// 	}
+
+// 	for index, data5 := range repo.ProblemRecord {
+// 		repo.ProblemRecord[index].Users = MapUser(data5.Operator, users)
+// 		for index, data := range users {
+// 			users[index].ListSystem = mapSystem(data.Systems, systems)
+// 		}
+// 	}
+
+// 	repo.Pageination = Pagination(c) // ส่งค่า pageination ไปให้ Pagination ทำงาน แล้ว return ค่ากลับมา แล้วเก็บไว้ใน repo.Pageination แล้วส่งค่าไปให้ client ด้วย
+// 	c.JSON(repo)
+// 	c.Set("Content-Type", "application/json")
+// 	return c.JSON(repo)
+// }
 
 
 func GetProblemById(c *fiber.Ctx) error {
@@ -638,22 +650,23 @@ func GetProblemRecordByProblemdescription(c *fiber.Ctx) error {
 }
 
 //pagination การจัดหน้า
-func Pagination(c *fiber.Ctx) entities.Pageination {
-	var problemrecord entities.ProblemRecord
-	var total_row int64
-	var page, limit int
-	var err error
-	page, err = strconv.Atoi(c.Query("page", "1"))
-	if err != nil {
-		page = 1
-	}
-	limit, err = strconv.Atoi(c.Query("limit", "10"))
-	if err != nil {
-		limit = 10
-	}
-	offset := (page - 1) * limit
-	database.Instance.Model(&problemrecord).Count(&total_row)
-	database.Instance.Limit(limit).Offset(offset).Find(&problemrecord)
+func Pagination(total_row int64,page int, limit int) entities.Pageination {
+
+	// var problemrecord entities.ProblemRecord
+	// var total_row int64
+	// var page, limit int
+	// var err error
+	// page, err = strconv.Atoi(c.Query("page", "1"))
+	// if err != nil {
+	// 	page = 1
+	// }
+	// limit, err = strconv.Atoi(c.Query("limit", "10"))
+	// if err != nil {
+	// 	limit = 10
+	// }
+
+	// keyword := c.Query("keyword", "")
+	
 
 	return entities.Pageination{
 		Page:     page,
